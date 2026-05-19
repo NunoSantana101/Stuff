@@ -1,0 +1,328 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MDRClassificationNote",
+  "description": "MDR Annex VIII classification result structured to the eleven-section regulatory note template. Two top-level contracts precede the content sections. The display_contract declares that the output is intended for rendering to the end user as a human-readable regulatory note, not as raw JSON; the structured JSON is the audit substrate, the rendered note is the user-facing artifact. The output_style_contract binds the model to plain-language prose voice across all subsequent prose fields. Both are required const fields the model must emit verbatim; emitting them is the schema's structural mechanism for binding the model to the display and style contracts. Description fields on each prose property restate the style requirement at field level. Grammar-enforced at the sampling layer: every required field present, every enum constrained, every additionalProperties false, exactly 22 rule assessments, minLength on all substantive prose. Soft-enforced via field descriptions: complete sentences, no bullet fragments inside string values, no markdown markup, regulatory voice. Style is not enforceable at the grammar level (that is process-rule territory), but the contracts are embedded structurally so the model cannot avoid acknowledging them, and the application layer reads display_contract to drive rendering rather than presenting raw JSON.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "display_contract",
+    "output_style_contract",
+    "section_1_final_mdr_device_classification",
+    "section_2_primary_mdr_classification_rule",
+    "section_3_classification_rationale",
+    "section_4_device_parameter_checklist",
+    "section_5_parameter_deduction_traceability",
+    "section_6_rule_by_rule_assessment",
+    "section_7_applicable_rules",
+    "section_8_excluded_rules",
+    "section_9_rule_conflict_and_precedence_assessment",
+    "section_10_validation_against_mdr_annex_viii_and_mdcg_2021_24",
+    "section_11_validation_status"
+  ],
+  "properties": {
+    "display_contract": {
+      "type": "string",
+      "description": "Top-level display contract. Must be populated with the exact const value. Declares that this output is intended for rendering to the end user as a human-readable regulatory note in the eleven-section template format, not as raw JSON. The application layer walks the section_1 through section_11 fields in order, formats prose fields as paragraphs and verbatim quotation fields as quoted blocks, and renders the whole as a regulatory note. The structured JSON is the audit substrate; the rendered note is the user-facing artifact. This contract takes precedence over any default JSON display behaviour in the UI.",
+      "const": "This output is structured as JSON for audit and machine readability, but it must be rendered to the end user as a human-readable regulatory note in the eleven-section template format. The application layer walks section_1 through section_11 in order, presents prose fields as paragraphs, presents verbatim quotation fields as block quotations, and renders the whole as a regulatory note. The user does not see raw JSON. The user sees the rendered note."
+    },
+    "output_style_contract": {
+      "type": "string",
+      "description": "Schema-level plain-language output contract. This field must be populated with the exact const value. By emitting it, the model declares that all subsequent prose fields in this output conform to the stated style. This is the schema's structural mechanism for binding model output to plain-language voice across the eleven sections.",
+      "const": "All prose fields in this output are written in plain-language regulatory note voice. Complete sentences only. No bullet fragments inside prose strings. No markdown formatting characters inside prose strings. Annex VIII text is quoted verbatim only in fields whose names contain 'verbatim'. All other prose is original, in the voice of a senior regulatory professional explaining the classification to a colleague reviewing the work."
+    },
+    "section_1_final_mdr_device_classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["class", "single_sentence_statement"],
+      "properties": {
+        "class": {
+          "type": ["string", "null"],
+          "enum": ["I", "IIa", "IIb", "III", null],
+          "description": "The final classification. Null only if validation_status is INSUFFICIENT_INFORMATION."
+        },
+        "single_sentence_statement": {
+          "type": "string",
+          "minLength": 15,
+          "description": "One plain-language sentence stating the final classification. Pattern: 'The device classifies as Class [X] under MDR Annex VIII Rule [Y].' Complete sentence. No fragments."
+        }
+      }
+    },
+    "section_2_primary_mdr_classification_rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule", "sub_clause_description", "single_paragraph_statement"],
+      "properties": {
+        "rule": {
+          "type": ["string", "null"],
+          "enum": ["RULE_1","RULE_2","RULE_3","RULE_4","RULE_5","RULE_6","RULE_7","RULE_8","RULE_9","RULE_10","RULE_11","RULE_12","RULE_13","RULE_14","RULE_15","RULE_16","RULE_17","RULE_18","RULE_19","RULE_20","RULE_21","RULE_22", null]
+        },
+        "sub_clause_description": {
+          "type": "string",
+          "minLength": 10,
+          "description": "Plain-language description of the sub-clause within the primary rule that governs (e.g. 'first paragraph, first indent — decisions whose impact may cause death or irreversible deterioration'). Complete phrase. No bullets."
+        },
+        "single_paragraph_statement": {
+          "type": "string",
+          "minLength": 80,
+          "description": "One paragraph in plain-language regulatory voice stating which rule governs the classification and why this rule is controlling. Complete sentences. No fragments, no bullets, no markdown."
+        }
+      }
+    },
+    "section_3_classification_rationale": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["controlling_logic_prose", "annex_viii_text_verbatim", "consequence_assessment_prose", "inadmissible_inputs_rejected"],
+      "properties": {
+        "controlling_logic_prose": {
+          "type": "string",
+          "minLength": 250,
+          "description": "Plain-language prose paragraph explaining the controlling logic of the classification. Voice of a senior regulatory professional. Complete sentences only. No bullets. No markdown. References Annex VIII clauses where applicable but does not quote them verbatim (verbatim quotation goes in annex_viii_text_verbatim)."
+        },
+        "annex_viii_text_verbatim": {
+          "type": "string",
+          "minLength": 80,
+          "description": "Verbatim quotation of the Annex VIII rule text being applied, including the rule number and the full text of the relevant indent or paragraph. This is one of the fields where verbatim quotation is required and permitted."
+        },
+        "consequence_assessment_prose": {
+          "type": "string",
+          "minLength": 200,
+          "description": "Plain-language prose paragraph explaining the consequence assessment under the controlling rule. Complete sentences. Describes the worst-case erroneous output, the foreseeable harm chain, the regulatory threshold this triggers, and the resulting class."
+        },
+        "inadmissible_inputs_rejected": {
+          "type": "array",
+          "description": "Array of deployer-provided inputs that were rejected as inadmissible bases for classification. Empty array if no such inputs were submitted.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["input_type", "input_value_quoted", "rejection_prose"],
+            "properties": {
+              "input_type": {
+                "type": "string",
+                "enum": ["asserted_classification", "jurisdictional_history", "market_positioning", "comparator_claims", "other"]
+              },
+              "input_value_quoted": {
+                "type": "string",
+                "minLength": 5,
+                "description": "The deployer's input as they presented it, in their own wording where possible."
+              },
+              "rejection_prose": {
+                "type": "string",
+                "minLength": 120,
+                "description": "Plain-language prose paragraph explaining why this input is inadmissible as a classification basis. Complete sentences. Cites Annex VIII, MDCG, or other authoritative basis for rejection."
+              }
+            }
+          }
+        }
+      }
+    },
+    "section_4_device_parameter_checklist": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["user_stated", "logically_deduced", "not_provided"],
+      "properties": {
+        "user_stated": {
+          "type": "array",
+          "description": "Parameters as stated by the user in the request.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["parameter_name", "value_prose"],
+            "properties": {
+              "parameter_name": { "type": "string", "minLength": 3 },
+              "value_prose": {
+                "type": "string",
+                "minLength": 5,
+                "description": "Plain-language statement of the parameter value as stated by the deployer."
+              }
+            }
+          }
+        },
+        "logically_deduced": {
+          "type": "array",
+          "description": "Parameters deduced from the user-stated information and Annex VIII definitions, with traceability.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["parameter_name", "deduced_value", "deduction_prose"],
+            "properties": {
+              "parameter_name": { "type": "string", "minLength": 3 },
+              "deduced_value": { "type": "string", "minLength": 2 },
+              "deduction_prose": {
+                "type": "string",
+                "minLength": 60,
+                "description": "Plain-language sentence or two explaining how the parameter was deduced and citing the Annex VIII or MDCG anchor that supports it."
+              }
+            }
+          }
+        },
+        "not_provided": {
+          "type": "array",
+          "description": "Parameters that were not provided and not deducible, with an impact assessment.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["parameter_name", "impact_prose"],
+            "properties": {
+              "parameter_name": { "type": "string", "minLength": 3 },
+              "impact_prose": {
+                "type": "string",
+                "minLength": 40,
+                "description": "Plain-language explanation of whether the missing parameter materially affects the classification and why."
+              }
+            }
+          }
+        }
+      }
+    },
+    "section_5_parameter_deduction_traceability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["traceability_prose"],
+      "properties": {
+        "traceability_prose": {
+          "type": "string",
+          "minLength": 150,
+          "description": "Plain-language paragraph mapping each logical deduction back to the Annex VIII or MDCG anchor that supports it. Complete sentences. Walks the deductions in the order they appear in section 4."
+        }
+      }
+    },
+    "section_6_rule_by_rule_assessment": {
+      "type": "array",
+      "minItems": 22,
+      "maxItems": 22,
+      "description": "Exactly twenty-two assessment objects, one per rule from Rule 1 to Rule 22, in numerical order. No rule may be skipped. No rule may appear twice.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rule", "applicability", "annex_viii_wording_verbatim", "assessment_prose", "resulting_class_if_applicable"],
+        "properties": {
+          "rule": {
+            "type": "string",
+            "enum": ["RULE_1","RULE_2","RULE_3","RULE_4","RULE_5","RULE_6","RULE_7","RULE_8","RULE_9","RULE_10","RULE_11","RULE_12","RULE_13","RULE_14","RULE_15","RULE_16","RULE_17","RULE_18","RULE_19","RULE_20","RULE_21","RULE_22"]
+          },
+          "applicability": {
+            "type": "string",
+            "enum": ["APPLICABLE", "NOT_APPLICABLE", "INDETERMINATE"]
+          },
+          "annex_viii_wording_verbatim": {
+            "type": "string",
+            "minLength": 30,
+            "description": "Verbatim quotation or close paraphrase of the rule text from Annex VIII Chapter III. One of the fields where verbatim quotation is required and permitted."
+          },
+          "assessment_prose": {
+            "type": "string",
+            "minLength": 40,
+            "description": "Plain-language sentence or short paragraph explaining the applicability determination. Cites the specific device characteristic that engages or excludes the rule. Complete sentences."
+          },
+          "resulting_class_if_applicable": {
+            "type": ["string", "null"],
+            "enum": ["I", "IIa", "IIb", "III", null],
+            "description": "The class this rule would yield if applicable. Null if the rule is NOT_APPLICABLE or INDETERMINATE."
+          }
+        }
+      }
+    },
+    "section_7_applicable_rules": {
+      "type": "array",
+      "description": "Rules determined to be APPLICABLE in section 6. May contain one or more rules. Order ascending.",
+      "items": {
+        "type": "string",
+        "enum": ["RULE_1","RULE_2","RULE_3","RULE_4","RULE_5","RULE_6","RULE_7","RULE_8","RULE_9","RULE_10","RULE_11","RULE_12","RULE_13","RULE_14","RULE_15","RULE_16","RULE_17","RULE_18","RULE_19","RULE_20","RULE_21","RULE_22"]
+      }
+    },
+    "section_8_excluded_rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["excluded_rules_prose"],
+      "properties": {
+        "excluded_rules_prose": {
+          "type": "string",
+          "minLength": 150,
+          "description": "Plain-language paragraph summarising why the excluded rules do not apply. Complete sentences. Walks the excluded rules in numerical order with brief justification for each. No bullets. No fragments."
+        }
+      }
+    },
+    "section_9_rule_conflict_and_precedence_assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["multiple_rules_engaged", "section_3_5_invoked", "precedence_prose"],
+      "properties": {
+        "multiple_rules_engaged": {
+          "type": "boolean",
+          "description": "True if multiple rules or multiple sub-clauses within a single rule are simultaneously applicable. False if only one rule and one sub-clause apply."
+        },
+        "section_3_5_invoked": {
+          "type": "boolean",
+          "description": "True if Annex VIII Chapter II Section 3.5 was invoked to resolve precedence. False if no precedence resolution was required."
+        },
+        "precedence_prose": {
+          "type": "string",
+          "minLength": 100,
+          "description": "Plain-language paragraph explaining how Section 3.5 was applied. Complete sentences. Identifies the rules or sub-clauses in conflict and the precedence outcome. If no precedence was needed, says so."
+        }
+      }
+    },
+    "section_10_validation_against_mdr_annex_viii_and_mdcg_2021_24": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["validation_checks", "validation_summary_prose"],
+      "properties": {
+        "validation_checks": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["all_22_rules_evaluated", "no_higher_risk_rule_missed", "exclusions_justified", "deductions_traceable", "precedence_correctly_applied", "mdcg_did_not_override_annex_viii"],
+          "properties": {
+            "all_22_rules_evaluated": { "type": "boolean" },
+            "no_higher_risk_rule_missed": { "type": "boolean" },
+            "exclusions_justified": { "type": "boolean" },
+            "deductions_traceable": { "type": "boolean" },
+            "precedence_correctly_applied": { "type": "boolean" },
+            "mdcg_did_not_override_annex_viii": { "type": "boolean" }
+          }
+        },
+        "validation_summary_prose": {
+          "type": "string",
+          "minLength": 150,
+          "description": "Plain-language paragraph summarising the validation of the classification against Annex VIII and MDCG 2021-24 rev.1. Complete sentences. Confirms each validation check and notes any caveats."
+        }
+      }
+    },
+    "section_11_validation_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "closing_statement_prose", "missing_parameters_if_insufficient"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["COMPLETE", "INSUFFICIENT_INFORMATION"]
+        },
+        "closing_statement_prose": {
+          "type": "string",
+          "minLength": 40,
+          "description": "Plain-language closing sentence or short paragraph. If status is COMPLETE, restates the final classification and notes any practical implication. If status is INSUFFICIENT_INFORMATION, identifies the missing parameters that block the determination."
+        },
+        "missing_parameters_if_insufficient": {
+          "type": "array",
+          "description": "Required if status is INSUFFICIENT_INFORMATION. Empty array if status is COMPLETE.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["parameter_name", "reason", "clarification_needed_prose"],
+            "properties": {
+              "parameter_name": { "type": "string", "minLength": 3 },
+              "reason": {
+                "type": "string",
+                "enum": ["MISSING", "AMBIGUOUS", "INTERNALLY_INCONSISTENT", "MULTIPLE_PLAUSIBLE_INTERPRETATIONS"]
+              },
+              "clarification_needed_prose": {
+                "type": "string",
+                "minLength": 30,
+                "description": "Plain-language statement of what clarification is needed to proceed."
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
